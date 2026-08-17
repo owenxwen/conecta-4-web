@@ -1,0 +1,268 @@
+:root {
+  --azul-tablero: #1e5fa8;
+  --azul-oscuro: #123a68;
+  --fondo: #0f1b2b;
+  --amarillo: #f4c542;
+  --rojo: #e0503b;
+  --texto-claro: #f4f1ea;
+  --texto-tenue: #9fb0c3;
+  --panel: #16263c;
+  --borde: #24344c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--fondo);
+  color: var(--texto-claro);
+  font-family: "Segoe UI", system-ui, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.fondo {
+  width: 100%;
+  max-width: 560px;
+}
+
+/* --- Pantallas --- */
+.pantalla {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+}
+
+.pantalla.activa {
+  display: flex;
+}
+
+h1 {
+  font-size: 2.6rem;
+  margin: 0;
+}
+
+h1 span {
+  color: var(--amarillo);
+}
+
+.subtitulo {
+  color: var(--texto-tenue);
+  margin-top: -8px;
+  margin-bottom: 8px;
+}
+
+label {
+  align-self: flex-start;
+  font-size: 0.85rem;
+  color: var(--texto-tenue);
+}
+
+input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--borde);
+  background: var(--panel);
+  color: var(--texto-claro);
+  font-size: 1rem;
+}
+
+input:focus {
+  outline: 2px solid var(--amarillo);
+  outline-offset: 1px;
+}
+
+.fila-doble {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.fila-doble > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+.opciones-sala {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.opciones-sala .btn-secundario {
+  flex: 1;
+}
+
+.btn-secundario.activo {
+  background: var(--azul-tablero);
+  border-color: var(--azul-tablero);
+  color: white;
+}
+
+.bloque-sala {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bloque-sala.oculto {
+  display: none;
+}
+
+button {
+  cursor: pointer;
+  font-size: 1rem;
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid var(--borde);
+  font-weight: 600;
+}
+
+.btn-primario {
+  background: var(--amarillo);
+  border-color: var(--amarillo);
+  color: #1a1a1a;
+  width: 100%;
+}
+
+.btn-secundario {
+  background: var(--panel);
+  color: var(--texto-claro);
+}
+
+.mensaje-error {
+  color: var(--rojo);
+  min-height: 1.2em;
+  font-size: 0.9rem;
+}
+
+/* --- Sala de espera --- */
+.codigo-grande {
+  font-size: 3rem;
+  letter-spacing: 0.2em;
+  font-weight: 700;
+  color: var(--amarillo);
+  background: var(--panel);
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: 1px solid var(--borde);
+}
+
+.esperando {
+  color: var(--texto-tenue);
+}
+
+/* --- Tablero --- */
+.cabecera-juego {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.jugador-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.ficha {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.ficha-x {
+  background: var(--rojo);
+}
+
+.ficha-o {
+  background: var(--amarillo);
+}
+
+.marcador {
+  color: var(--texto-tenue);
+  font-size: 0.9rem;
+}
+
+.turno-actual {
+  font-weight: 600;
+  min-height: 1.4em;
+}
+
+.tablero {
+  display: grid;
+  gap: 6px;
+  background: var(--azul-tablero);
+  padding: 10px;
+  border-radius: 12px;
+  border: 4px solid var(--azul-oscuro);
+  width: 100%;
+}
+
+.celda {
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: var(--fondo);
+  border: none;
+  padding: 0;
+}
+
+.celda.x {
+  background: var(--rojo);
+}
+
+.celda.o {
+  background: var(--amarillo);
+}
+
+.celda.jugable:hover {
+  filter: brightness(1.3);
+  cursor: pointer;
+}
+
+.panel-resultado {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  background: var(--panel);
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.panel-resultado.oculto {
+  display: none;
+}
+
+#texto-resultado {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+@media (max-width: 420px) {
+  h1 {
+    font-size: 2.1rem;
+  }
+  .codigo-grande {
+    font-size: 2.2rem;
+  }
+}

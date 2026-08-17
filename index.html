@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conecta4 Online</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="fondo">
+
+  <!-- PANTALLA 1: nombre + crear/unirse a sala -->
+  <section id="pantalla-inicio" class="pantalla activa">
+    <h1>Conecta<span>4</span></h1>
+    <p class="subtitulo">Jugado en línea, cada quien desde su dispositivo</p>
+
+    <label for="input-nombre">Tu nombre</label>
+    <input id="input-nombre" type="text" maxlength="10" placeholder="Máximo 10 caracteres, sin números">
+
+    <div class="opciones-sala">
+      <button id="btn-mostrar-crear" class="btn-secundario activo">Crear sala</button>
+      <button id="btn-mostrar-unirse" class="btn-secundario">Unirse a sala</button>
+    </div>
+
+    <div id="bloque-crear" class="bloque-sala">
+      <div class="fila-doble">
+        <div>
+          <label for="input-filas">Filas</label>
+          <input id="input-filas" type="number" min="4" value="6">
+        </div>
+        <div>
+          <label for="input-columnas">Columnas</label>
+          <input id="input-columnas" type="number" min="4" value="7">
+        </div>
+      </div>
+      <button id="btn-crear" class="btn-primario">Crear sala</button>
+    </div>
+
+    <div id="bloque-unirse" class="bloque-sala oculto">
+      <label for="input-codigo">Código de la sala</label>
+      <input id="input-codigo" type="text" maxlength="4" placeholder="Ej: 4821">
+      <button id="btn-unirse" class="btn-primario">Unirse</button>
+    </div>
+
+    <p id="mensaje-error" class="mensaje-error"></p>
+  </section>
+
+  <!-- PANTALLA 2: sala de espera -->
+  <section id="pantalla-espera" class="pantalla">
+    <h2>Sala creada</h2>
+    <p>Comparte este código con tu amigo:</p>
+    <div id="codigo-sala" class="codigo-grande"></div>
+    <p class="esperando">Esperando a que se una tu amigo…</p>
+  </section>
+
+  <!-- PANTALLA 3: tablero de juego -->
+  <section id="pantalla-juego" class="pantalla">
+    <div class="cabecera-juego">
+      <div class="jugador-info" id="info-x">
+        <span class="ficha ficha-x"></span>
+        <span id="nombre-x">—</span>
+      </div>
+      <div class="marcador">
+        <span id="marcador-x">0</span> · <span id="marcador-empates">0</span> · <span id="marcador-o">0</span>
+      </div>
+      <div class="jugador-info" id="info-o">
+        <span id="nombre-o">—</span>
+        <span class="ficha ficha-o"></span>
+      </div>
+    </div>
+
+    <p id="turno-actual" class="turno-actual"></p>
+
+    <div id="tablero" class="tablero"></div>
+
+    <button id="btn-aleatorio" class="btn-secundario">🎲 Tirar en columna aleatoria</button>
+
+    <div id="panel-resultado" class="panel-resultado oculto">
+      <p id="texto-resultado"></p>
+      <button id="btn-jugar-de-nuevo" class="btn-primario">Jugar de nuevo</button>
+    </div>
+  </section>
+
+</div>
+
+<!-- Firebase (SDK compat, sin necesidad de build tools) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
