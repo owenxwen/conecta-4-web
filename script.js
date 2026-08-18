@@ -334,8 +334,12 @@ document.getElementById("btn-aleatorio").addEventListener("click", () => {
 
 // Muestra una ficha por cada fila de la columna, dejando cada fotograma
 // visible medio segundo antes de pasar al siguiente.
-function esperar(milisegundos) {
-  return new Promise(resolve => setTimeout(resolve, milisegundos));
+function esperarFotograma(milisegundos) {
+  return new Promise(resolve => {
+    requestAnimationFrame(() => {
+      setTimeout(resolve, milisegundos);
+    });
+  });
 }
 
 async function animarYAplicarJugada(sala, columna) {
@@ -351,7 +355,7 @@ async function animarYAplicarJugada(sala, columna) {
 
   for (let fila = 0; fila <= filaDestino; fila++) {
     dibujarTablero(sala.tablero, false, { fila, columna, ficha: miSimbolo });
-    await esperar(500);
+    await esperarFotograma(500);
   }
 
   animandoJugada = false;
