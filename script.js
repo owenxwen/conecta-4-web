@@ -27,6 +27,7 @@ const pantallaInicio = document.getElementById("pantalla-inicio");
 const pantallaEspera = document.getElementById("pantalla-espera");
 const pantallaJuego = document.getElementById("pantalla-juego");
 const mensajeError = document.getElementById("mensaje-error");
+const VELOCIDAD_CAIDA = 250;
 
 function mostrarPantalla(pantalla) {
   [pantallaInicio, pantallaEspera, pantallaJuego].forEach(p => p.classList.remove("activa"));
@@ -432,11 +433,11 @@ async function animarYAplicarJugada(sala, columna) {
       ficha: miSimbolo
     };
 
-    // Envía cada fotograma para que el otro jugador también lo vea.
-    await refSala.update({ animacion: fichaEnCaida });
+    refSala.update({ animacion: fichaEnCaida });
 
     dibujarTablero(sala.tablero, false, fichaEnCaida);
-    await esperarFotograma(100);
+
+    await new Promise(resolve => setTimeout(resolve, VELOCIDAD_CAIDA));
   }
 
   animandoJugada = false;
