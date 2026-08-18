@@ -174,6 +174,7 @@ document.getElementById("btn-crear").addEventListener("click", () => {
     jugadorO: null,
     estado: "esperando",
     ganador: null,
+    animacion: null,
     marcador: { X: 0, O: 0, empates: 0 }
   };
 
@@ -250,7 +251,8 @@ function pintarSala(sala) {
   document.getElementById("marcador-o").textContent = sala.marcador.O;
   document.getElementById("marcador-empates").textContent = sala.marcador.empates;
 
-  const esMiTurno = sala.turno === miSimbolo && sala.estado === "jugando";
+  const hayAnimacion = Boolean(sala.animacion);
+  const esMiTurno = sala.turno === miSimbolo && sala.estado === "jugando" && !hayAnimacion;
   const turnoTexto = document.getElementById("turno-actual");
   if (sala.estado === "jugando") {
     const nombreEnTurno = sala.turno === "X" ? sala.jugadorX : sala.jugadorO;
@@ -259,7 +261,7 @@ function pintarSala(sala) {
     turnoTexto.textContent = "";
   }
 
-  dibujarTablero(sala.tablero, esMiTurno);
+  dibujarTablero(sala.tablero, esMiTurno, sala.animacion || null);
 
   const panelResultado = document.getElementById("panel-resultado");
   const btnAleatorio = document.getElementById("btn-aleatorio");
@@ -354,7 +356,16 @@ async function animarYAplicarJugada(sala, columna) {
   document.getElementById("btn-aleatorio").disabled = true;
 
   for (let fila = 0; fila <= filaDestino; fila++) {
-    dibujarTablero(sala.tablero, false, { fila, columna, ficha: miSimbolo });
+    const fichaEnCaida = {
+      fila,
+      columna,
+      ficha: miSimbolo
+    };
+
+    // Envía cada fotograma para que el otro jugador también lo vea.
+    await refSala.update({ animacion: fichaEnCaida });
+
+    dibujarTablero(sala.tablero, false, fichaEnCaida);
     await esperarFotograma(500);
   }
 
@@ -367,7 +378,10 @@ function aplicarJugada(sala, tabla) {
   const gano = verificarGanador(tabla, miSimbolo, sala.filas, sala.columnas);
   const lleno = tableroLleno(tabla);
 
-  const actualizacion = { tablero: tabla };
+  const actualizacion = {
+    tablero: tabla,
+    animacion: null
+  };
 
   if (gano) {
     actualizacion.estado = "terminado";
