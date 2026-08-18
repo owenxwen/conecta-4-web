@@ -436,7 +436,7 @@ async function animarYAplicarJugada(sala, columna) {
     await refSala.update({ animacion: fichaEnCaida });
 
     dibujarTablero(sala.tablero, false, fichaEnCaida);
-    await esperarFotograma(300);
+    await esperarFotograma(100);
   }
 
   animandoJugada = false;
