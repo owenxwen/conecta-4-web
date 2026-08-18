@@ -231,6 +231,10 @@ button {
   background: var(--amarillo);
 }
 
+.celda.ficha-en-caida {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35);
+}
+
 .celda.jugable:hover {
   filter: brightness(1.3);
   cursor: pointer;

@@ -18,6 +18,7 @@ let codigoSala = null;
 let refSala = null;
 let filasSala = 6;
 let columnasSala = 7;
+let animandoJugada = false;
 
 // ---------- referencias a elementos ----------
 const pantallaInicio = document.getElementById("pantalla-inicio");
@@ -278,7 +279,7 @@ function pintarSala(sala) {
   }
 }
 
-function dibujarTablero(tabla, esMiTurno) {
+function dibujarTablero(tabla, esMiTurno, fichaEnCaida = null) {
   const contenedor = document.getElementById("tablero");
   contenedor.innerHTML = "";
   contenedor.style.gridTemplateColumns = `repeat(${columnasSala}, 1fr)`;
@@ -289,7 +290,10 @@ function dibujarTablero(tabla, esMiTurno) {
       celda.classList.add("celda");
       if (tabla[f][c] === "X") celda.classList.add("x");
       if (tabla[f][c] === "O") celda.classList.add("o");
-      if (esMiTurno && tabla[0][c] === "#") {
+      if (fichaEnCaida && fichaEnCaida.fila === f && fichaEnCaida.columna === c) {
+        celda.classList.add(fichaEnCaida.ficha === "X" ? "x" : "o", "ficha-en-caida");
+      }
+      if (!fichaEnCaida && esMiTurno && tabla[0][c] === "#") {
         celda.classList.add("jugable");
         celda.addEventListener("click", () => jugarColumna(c));
       } else {
@@ -305,32 +309,55 @@ function dibujarTablero(tabla, esMiTurno) {
    ========================================================== */
 
 function jugarColumna(columna) {
+  if (animandoJugada) return;
+
   refSala.get().then(snapshot => {
     const sala = snapshot.val();
-    if (sala.turno !== miSimbolo || sala.estado !== "jugando") return;
-
-    const tabla = sala.tablero;
-    const filaDestino = colocarFicha(tabla, columna, miSimbolo);
-    if (filaDestino === null) return; // columna llena, no debería pasar por la UI
-
-    aplicarJugada(sala, tabla);
+    if (!sala || sala.turno !== miSimbolo || sala.estado !== "jugando") return;
+    animarYAplicarJugada(sala, columna);
   });
 }
 
 document.getElementById("btn-aleatorio").addEventListener("click", () => {
+  if (animandoJugada) return;
+
   refSala.get().then(snapshot => {
     const sala = snapshot.val();
-    if (sala.turno !== miSimbolo || sala.estado !== "jugando") return;
+    if (!sala || sala.turno !== miSimbolo || sala.estado !== "jugando") return;
 
-    const tabla = sala.tablero;
-    const disponibles = columnasDisponibles(tabla);
+    const disponibles = columnasDisponibles(sala.tablero);
     if (disponibles.length === 0) return;
     const columna = disponibles[Math.floor(Math.random() * disponibles.length)];
-    colocarFicha(tabla, columna, miSimbolo);
-
-    aplicarJugada(sala, tabla);
+    animarYAplicarJugada(sala, columna);
   });
 });
+
+// Muestra una ficha por cada fila de la columna, dejando cada fotograma
+// visible medio segundo antes de pasar al siguiente.
+function esperar(milisegundos) {
+  return new Promise(resolve => setTimeout(resolve, milisegundos));
+}
+
+async function animarYAplicarJugada(sala, columna) {
+  if (animandoJugada) return;
+
+  // Se copia el tablero para no modificar el estado recibido hasta el final.
+  const tabla = sala.tablero.map(fila => [...fila]);
+  const filaDestino = colocarFicha(tabla, columna, miSimbolo);
+  if (filaDestino === null) return;
+
+  animandoJugada = true;
+  document.getElementById("btn-aleatorio").disabled = true;
+
+  for (let fila = 0; fila <= filaDestino; fila++) {
+    dibujarTablero(sala.tablero, false, { fila, columna, ficha: miSimbolo });
+    await esperar(500);
+  }
+
+  animandoJugada = false;
+  document.getElementById("btn-aleatorio").disabled = false;
+  aplicarJugada(sala, tabla);
+}
 
 function aplicarJugada(sala, tabla) {
   const gano = verificarGanador(tabla, miSimbolo, sala.filas, sala.columnas);
