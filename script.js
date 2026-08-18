@@ -19,6 +19,8 @@ let refSala = null;
 let filasSala = 6;
 let columnasSala = 7;
 let animandoJugada = false;
+let contextoAudio = null;
+let ultimoFotogramaSonoro = null;
 
 // ---------- referencias a elementos ----------
 const pantallaInicio = document.getElementById("pantalla-inicio");
@@ -33,6 +35,54 @@ function mostrarPantalla(pantalla) {
 
 function mostrarError(texto) {
   mensajeError.textContent = texto;
+}
+
+function prepararSonido() {
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContext) return;
+
+  if (!contextoAudio) {
+    contextoAudio = new AudioContext();
+  }
+
+  if (contextoAudio.state === "suspended") {
+    contextoAudio.resume();
+  }
+}
+
+function sonarFicha() {
+  if (!contextoAudio || contextoAudio.state !== "running") return;
+
+  const oscilador = contextoAudio.createOscillator();
+  const volumen = contextoAudio.createGain();
+  const ahora = contextoAudio.currentTime;
+
+  oscilador.type = "sine";
+  oscilador.frequency.setValueAtTime(180, ahora);
+
+  volumen.gain.setValueAtTime(0.001, ahora);
+  volumen.gain.exponentialRampToValueAtTime(0.18, ahora + 0.01);
+  volumen.gain.exponentialRampToValueAtTime(0.001, ahora + 0.09);
+
+  oscilador.connect(volumen);
+  volumen.connect(contextoAudio.destination);
+
+  oscilador.start(ahora);
+  oscilador.stop(ahora + 0.1);
+}
+
+function sonarFotograma(animacion) {
+  if (!animacion) {
+    ultimoFotogramaSonoro = null;
+    return;
+  }
+
+  const identificador = `${animacion.ficha}-${animacion.columna}-${animacion.fila}`;
+
+  if (identificador !== ultimoFotogramaSonoro) {
+    ultimoFotogramaSonoro = identificador;
+    sonarFicha();
+  }
 }
 
 // ---------- función que verifica el nombre (igual que verificar_nombre) ----------
@@ -147,6 +197,8 @@ document.getElementById("btn-mostrar-unirse").addEventListener("click", () => {
 });
 
 document.getElementById("btn-crear").addEventListener("click", () => {
+  prepararSonido();
+
   const nombre = document.getElementById("input-nombre").value.trim();
   const errorNombre = verificarNombre(nombre);
   if (errorNombre) return mostrarError(errorNombre);
@@ -186,6 +238,8 @@ document.getElementById("btn-crear").addEventListener("click", () => {
 });
 
 document.getElementById("btn-unirse").addEventListener("click", () => {
+  prepararSonido();
+
   const nombre = document.getElementById("input-nombre").value.trim();
   const errorNombre = verificarNombre(nombre);
   if (errorNombre) return mostrarError(errorNombre);
@@ -245,6 +299,8 @@ function escucharSala() {
    ========================================================== */
 
 function pintarSala(sala) {
+  sonarFotograma(sala.animacion);
+
   document.getElementById("nombre-x").textContent = sala.jugadorX;
   document.getElementById("nombre-o").textContent = sala.jugadorO;
   document.getElementById("marcador-x").textContent = sala.marcador.X;
