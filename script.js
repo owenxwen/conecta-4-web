@@ -48,6 +48,18 @@ function prepararSonido() {
   if (contextoAudio.state === "suspended") {
     contextoAudio.resume();
   }
+
+  // Reproduce un fotograma silencioso para desbloquear el audio en móviles.
+  const silencio = contextoAudio.createBuffer(
+    1,
+    1,
+    contextoAudio.sampleRate
+  );
+
+  const fuenteSilenciosa = contextoAudio.createBufferSource();
+  fuenteSilenciosa.buffer = silencio;
+  fuenteSilenciosa.connect(contextoAudio.destination);
+  fuenteSilenciosa.start(0);
 }
 
 function sonarFicha() {
@@ -84,6 +96,8 @@ function sonarFotograma(animacion) {
     sonarFicha();
   }
 }
+
+document.addEventListener("pointerdown", prepararSonido, { once: true });
 
 // ---------- función que verifica el nombre (igual que verificar_nombre) ----------
 function verificarNombre(nombre) {
