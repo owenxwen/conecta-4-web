@@ -21,6 +21,7 @@ let columnasSala = 7;
 let animandoJugada = false;
 let contextoAudio = null;
 let ultimoFotogramaSonoro = null;
+let resultadoSonoroReproducido = false;
 
 // ---------- referencias a elementos ----------
 const pantallaInicio = document.getElementById("pantalla-inicio");
@@ -82,6 +83,65 @@ function sonarFicha() {
 
   oscilador.start(ahora);
   oscilador.stop(ahora + 0.1);
+}
+
+function reproducirNota(frecuencia, inicio, duracion) {
+  const oscilador = contextoAudio.createOscillator();
+  const volumen = contextoAudio.createGain();
+
+  oscilador.type = "sine";
+  oscilador.frequency.setValueAtTime(frecuencia, inicio);
+
+  volumen.gain.setValueAtTime(0.001, inicio);
+  volumen.gain.exponentialRampToValueAtTime(0.16, inicio + 0.02);
+  volumen.gain.exponentialRampToValueAtTime(0.001, inicio + duracion);
+
+  oscilador.connect(volumen);
+  volumen.connect(contextoAudio.destination);
+
+  oscilador.start(inicio);
+  oscilador.stop(inicio + duracion);
+}
+
+function sonarVictoria() {
+  if (!contextoAudio || contextoAudio.state !== "running") return;
+
+  const ahora = contextoAudio.currentTime;
+  reproducirNota(523.25, ahora, 0.15);
+  reproducirNota(659.25, ahora + 0.16, 0.18);
+}
+
+function sonarDerrota() {
+  if (!contextoAudio || contextoAudio.state !== "running") return;
+
+  const ahora = contextoAudio.currentTime;
+  reproducirNota(220, ahora, 0.18);
+  reproducirNota(164.81, ahora + 0.19, 0.25);
+}
+
+function sonarResultado(sala) {
+  if (sala.estado !== "terminado") {
+    resultadoSonoroReproducido = false;
+    return;
+  }
+
+  if (resultadoSonoroReproducido) return;
+
+  // No reproduce victoria ni derrota cuando hay empate.
+  if (sala.ganador === "empate") {
+    resultadoSonoroReproducido = true;
+    return;
+  }
+
+  if (!contextoAudio || contextoAudio.state !== "running") return;
+
+  if (sala.ganador === miSimbolo) {
+    sonarVictoria();
+  } else {
+    sonarDerrota();
+  }
+
+  resultadoSonoroReproducido = true;
 }
 
 function sonarFotograma(animacion) {
@@ -316,6 +376,7 @@ function escucharSala() {
 
 function pintarSala(sala) {
   sonarFotograma(sala.animacion);
+  sonarResultado(sala);
 
   document.getElementById("nombre-x").textContent = sala.jugadorX;
   document.getElementById("nombre-o").textContent = sala.jugadorO;
