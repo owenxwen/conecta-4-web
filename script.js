@@ -64,7 +64,7 @@ function prepararSonido() {
   fuenteSilenciosa.start(0);
 }
 
-function sonarFicha() {
+function sonarFicha() {sonarderrot
   if (!contextoAudio || contextoAudio.state !== "running") return;
 
   const oscilador = contextoAudio.createOscillator();
@@ -419,10 +419,21 @@ function pintarSala(sala) {
     const revancha = sala.revancha || { X: false, O: false };
     const yaConfirme = revancha[miSimbolo] === true;
 
-    btnJugarDeNuevo.disabled = yaConfirme;
-    btnJugarDeNuevo.textContent = yaConfirme
-      ? "Esperando al otro jugador..."
-      : "Jugar de nuevo";
+    const otroSimbolo = miSimbolo === "X" ? "O" : "X";
+    const nombreDelOtro = otroSimbolo === "X"
+      ? sala.jugadorX
+      : sala.jugadorO;
+
+    if (yaConfirme) {
+      btnJugarDeNuevo.disabled = true;
+      btnJugarDeNuevo.textContent = "Esperando al otro jugador 1/2...";
+    } else if (revancha[otroSimbolo]) {
+      btnJugarDeNuevo.disabled = false;
+      btnJugarDeNuevo.textContent = `${nombreDelOtro} quiere jugar de nuevo 1/2...`;
+    } else {
+      btnJugarDeNuevo.disabled = false;
+      btnJugarDeNuevo.textContent = "Jugar de nuevo";
+    }
 
   } else {
     panelResultado.classList.add("oculto");
