@@ -242,6 +242,7 @@ document.getElementById("btn-crear").addEventListener("click", () => {
     estado: "esperando",
     ganador: null,
     animacion: null,
+    revancha: { X: false, O: false },
     marcador: { X: 0, O: 0, empates: 0 }
   };
 
@@ -327,7 +328,7 @@ function pintarSala(sala) {
   const turnoTexto = document.getElementById("turno-actual");
   if (sala.estado === "jugando") {
     const nombreEnTurno = sala.turno === "X" ? sala.jugadorX : sala.jugadorO;
-    turnoTexto.textContent = esMiTurno ? "Es tu turno" : `Turno de ${nombreEnTurno}`;
+    turnoTexto.textContent = esMiTurno ? "¡Es tu turno!" : `Turno de ${nombreEnTurno}`;
   } else {
     turnoTexto.textContent = "";
   }
@@ -336,19 +337,38 @@ function pintarSala(sala) {
 
   const panelResultado = document.getElementById("panel-resultado");
   const btnAleatorio = document.getElementById("btn-aleatorio");
+  const btnJugarDeNuevo = document.getElementById("btn-jugar-de-nuevo");
+
   if (sala.estado === "terminado") {
     panelResultado.classList.remove("oculto");
     btnAleatorio.classList.add("oculto");
+
     const texto = document.getElementById("texto-resultado");
+
     if (sala.ganador === "empate") {
       texto.textContent = "La partida terminó en empate";
     } else {
-      const nombreGanador = sala.ganador === "X" ? sala.jugadorX : sala.jugadorO;
+      const nombreGanador = sala.ganador === "X"
+        ? sala.jugadorX
+        : sala.jugadorO;
+
       texto.textContent = `¡${nombreGanador} (${sala.ganador}) ganó la partida!`;
     }
+
+    const revancha = sala.revancha || { X: false, O: false };
+    const yaConfirme = revancha[miSimbolo] === true;
+
+    btnJugarDeNuevo.disabled = yaConfirme;
+    btnJugarDeNuevo.textContent = yaConfirme
+      ? "Esperando al otro jugador..."
+      : "Jugar de nuevo";
+
   } else {
     panelResultado.classList.add("oculto");
     btnAleatorio.classList.remove("oculto");
+
+    btnJugarDeNuevo.disabled = false;
+    btnJugarDeNuevo.textContent = "Jugar de nuevo";
   }
 }
 
@@ -474,14 +494,28 @@ function aplicarJugada(sala, tabla) {
    ========================================================== */
 
 document.getElementById("btn-jugar-de-nuevo").addEventListener("click", () => {
-  refSala.get().then(snapshot => {
-    const sala = snapshot.val();
-    const primerTurno = Math.random() < 0.5 ? "X" : "O";
-    refSala.update({
-      tablero: crearTableroVacio(sala.filas, sala.columnas),
-      estado: "jugando",
-      ganador: null,
-      turno: primerTurno
-    });
+  refSala.transaction(sala => {
+    if (!sala || sala.estado !== "terminado") return;
+
+    if (!sala.revancha) {
+      sala.revancha = { X: false, O: false };
+    }
+
+    // Marca que este jugador quiere una revancha.
+    sala.revancha[miSimbolo] = true;
+
+    // Solo se reinicia cuando ambos han confirmado.
+    if (sala.revancha.X && sala.revancha.O) {
+      const primerTurno = Math.random() < 0.5 ? "X" : "O";
+
+      sala.tablero = crearTableroVacio(sala.filas, sala.columnas);
+      sala.estado = "jugando";
+      sala.ganador = null;
+      sala.animacion = null;
+      sala.turno = primerTurno;
+      sala.revancha = { X: false, O: false };
+    }
+
+    return sala;
   });
 });
