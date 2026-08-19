@@ -71,10 +71,10 @@ function sonarFicha() {
   const volumen = contextoAudio.createGain();
   const ahora = contextoAudio.currentTime;
 
-  oscilador.type = "sine";
-  oscilador.frequency.setValueAtTime(180, ahora);
+  oscilador.type = "triangle";
+  oscilador.frequency.setValueAtTime(420, ahora);
 
-  volumen.gain.setValueAtTime(0.001, ahora);
+  volumen.gain.exponentialRampToValueAtTime(0.55, ahora + 0.01);
   volumen.gain.exponentialRampToValueAtTime(0.18, ahora + 0.01);
   volumen.gain.exponentialRampToValueAtTime(0.001, ahora + 0.09);
 
@@ -89,11 +89,11 @@ function reproducirNota(frecuencia, inicio, duracion) {
   const oscilador = contextoAudio.createOscillator();
   const volumen = contextoAudio.createGain();
 
-  oscilador.type = "sine";
+  oscilador.type = "triangle";
   oscilador.frequency.setValueAtTime(frecuencia, inicio);
 
   volumen.gain.setValueAtTime(0.001, inicio);
-  volumen.gain.exponentialRampToValueAtTime(0.16, inicio + 0.02);
+  volumen.gain.exponentialRampToValueAtTime(0.5, inicio + 0.02);
   volumen.gain.exponentialRampToValueAtTime(0.001, inicio + duracion);
 
   oscilador.connect(volumen);
@@ -115,8 +115,8 @@ function sonarDerrota() {
   if (!contextoAudio || contextoAudio.state !== "running") return;
 
   const ahora = contextoAudio.currentTime;
-  reproducirNota(220, ahora, 0.18);
-  reproducirNota(164.81, ahora + 0.19, 0.25);
+  reproducirNota(392, ahora, 0.18);
+  reproducirNota(294, ahora + 0.19, 0.25);
 }
 
 function sonarResultado(sala) {
