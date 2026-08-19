@@ -64,7 +64,7 @@ function prepararSonido() {
   fuenteSilenciosa.start(0);
 }
 
-function sonarFicha() {sonarderrot
+function sonarFicha() {
   if (!contextoAudio || contextoAudio.state !== "running") return;
 
   const oscilador = contextoAudio.createOscillator();
